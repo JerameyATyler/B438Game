@@ -1,20 +1,56 @@
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Cypher
 {
 
+    String[] quote = new String[2];
+    String[] encryptedQuote = new String[2];
+    ArrayList<String[]> quotesList = new ArrayList();
+
     public static void main(String[] args)
     {
-        String[] quote = new String[2];
-        quote[0] = "Beauty is in the heart of the beholder.";
-        quote[1] = "H. G. Wells";
         Cypher cypher = new Cypher();
 
-        String[] encryptedQuote = cypher.encrypt(quote);
+        cypher.populateQuoteList();
 
-        System.out.println(encryptedQuote[0]);
-        System.out.println("\t" + encryptedQuote[1]);
+        cypher.quote = cypher.getQuote();
+        cypher.encryptedQuote = cypher.encrypt(cypher.quote);
+
+        System.out.println(cypher.encryptedQuote[0]);
+        System.out.println("\t" + cypher.encryptedQuote[1]);
+        System.out.println(cypher.quote[0]);
+        System.out.println("\t" + cypher.quote[1]);
+    }
+
+    public void populateQuoteList()
+    {
+        File quotes = new File("Quotes.txt");
+
+        try
+        {
+            Scanner in = new Scanner(quotes);
+
+            while (in.hasNext())
+            {
+                String[] s =
+                {
+                    in.nextLine(), in.nextLine()
+                };
+                quotesList.add(s);
+            }
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+
+    public String[] getQuote()
+    {
+        return (quotesList.get((int) (Math.random() * quotesList.size())));
     }
 
     public String[] encrypt(String[] original)
@@ -29,7 +65,7 @@ public class Cypher
             }
         }
 
-        String[] encryptedQuote = new String[2];
+        String[] encrypted = new String[2];
 
         for (int i = 0; i < 2; i++)
         {
@@ -54,8 +90,8 @@ public class Cypher
                     temp += original[i].charAt(j);
                 }
             }
-            encryptedQuote[i] = temp;
+            encrypted[i] = temp;
         }
-        return encryptedQuote;
+        return encrypted;
     }
 }
