@@ -50,7 +50,7 @@ public class Cypher
 
     public String[] getQuote()
     {
-        return (quotesList.get((int) (Math.random() * quotesList.size())));
+        return (quotesList.get((int) (Math.random() * (quotesList.size()))));
     }
 
     public String[] encrypt(String[] original)
