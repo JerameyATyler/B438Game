@@ -94,4 +94,19 @@ public class Cypher
         }
         return encrypted;
     }
+    
+    public boolean compare(String[] userGuess, String[] actualQuote) 
+    {
+        for (int i = 0; i < 2; i++) 
+        {
+            for (int j = 0; j < actualQuote[i].length(); j++) 
+            {
+                if (userGuess[i].charAt(j) != actualQuote[i].charAt(j)) 
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 }
