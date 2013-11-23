@@ -1,5 +1,10 @@
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -16,13 +21,57 @@ public class Cypher
 
         cypher.populateQuoteList();
 
-        cypher.quote = cypher.getQuote();
-        cypher.encryptedQuote = cypher.encrypt(cypher.quote);
+        try
+        {
+            ServerSocket ss = new ServerSocket(9001);
+            Socket socket = ss.accept();
+            while (true)
+            {
+                
+                BufferedReader in = new BufferedReader(new InputStreamReader(
+                        socket.getInputStream()));
+                String command = in.readLine();
+                if (command.compareToIgnoreCase("get") == 0)
+                {
+                    PrintWriter out = new PrintWriter(socket.getOutputStream(),
+                            true);
 
-        System.out.println(cypher.encryptedQuote[0]);
-        System.out.println("\t" + cypher.encryptedQuote[1]);
-        System.out.println(cypher.quote[0]);
-        System.out.println("\t" + cypher.quote[1]);
+                    cypher.quote = cypher.getQuote();
+                    cypher.encryptedQuote = cypher.encrypt(cypher.quote);
+
+                    out.println(cypher.encryptedQuote[0] + "/n" 
+                            + cypher.encryptedQuote[1]);
+                    
+                    for(String s : cypher.quote)
+                    {
+                        System.out.println(s);
+                    }
+                }
+                else
+                {
+                    String[] message = command.split("/n");
+                    if(message[0].compareToIgnoreCase(cypher.quote[0]) == 0 &&
+                            message[1].compareToIgnoreCase(cypher.quote[1]) == 0)
+                    {
+                        PrintWriter out = new PrintWriter(socket.getOutputStream(),
+                                true);
+                        
+                        out.println("true");
+                    }
+                    else
+                    {
+                        PrintWriter out = new PrintWriter(socket.getOutputStream(),
+                                true);
+                        
+                        out.println("false");
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
     }
 
     public void populateQuoteList()
