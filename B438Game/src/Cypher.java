@@ -23,7 +23,7 @@ public class Cypher
 
         try
         {
-            ServerSocket ss = new ServerSocket(9001);
+            ServerSocket ss = new ServerSocket(65000);
             Socket socket = ss.accept();
             while (true)
             {
