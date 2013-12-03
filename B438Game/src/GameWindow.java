@@ -217,13 +217,14 @@ public class GameWindow extends javax.swing.JFrame implements ActionListener{
      */
     public GameWindow() {
         
-        this.setLocationRelativeTo(null);
+        
         try
         {
-        socket = new Socket("127.0.0.1", 9001);
-        
-        String message = getQuote();
-        quote = message.split("/n");
+            String ip = JOptionPane.showInputDialog(this, "Enter the server's IP address:", " IP Input", 3);
+            socket = new Socket(ip, 65000);
+
+            String message = getQuote();
+            quote = message.split("/n");
         
         }
         catch(Exception ex)
@@ -232,6 +233,7 @@ public class GameWindow extends javax.swing.JFrame implements ActionListener{
         }
         
         initComponents();
+        this.setLocationRelativeTo(null);
         refreshTimer.start();
         displayTimer.start();
     }
@@ -1034,7 +1036,7 @@ public class GameWindow extends javax.swing.JFrame implements ActionListener{
             boolean validation = validateQuote(jTextArea1.getText());
             if(validation)
             {
-                JOptionPane.showMessageDialog(this, "Congratulations, you did it!");
+                JOptionPane.showMessageDialog(this, "Congratulations, you did it!", "Quote Decrypted", 1);
             }
         }
 
