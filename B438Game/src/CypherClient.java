@@ -27,10 +27,8 @@ public class CypherClient
             for (String s : quote)
             {
                 System.out.println(s);
-            }
-            
-            
-            
+            }         
+         
             Scanner input = new Scanner(System.in);
             String inquote = input.nextLine();
             String inquoter = input.nextLine();

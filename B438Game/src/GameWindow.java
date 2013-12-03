@@ -1,3 +1,13 @@
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+import javax.swing.JOptionPane;
+import javax.swing.Timer;
+
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -7,8 +17,17 @@
  *
  * @author Andrei
  */
-public class GameWindow extends javax.swing.JFrame {
+public class GameWindow extends javax.swing.JFrame implements ActionListener{
 
+    Socket socket;
+    String[] quote;
+    
+    boolean validationFlag = false;
+    
+    Timer refreshTimer = new Timer(31000, this);
+    Timer displayTimer = new Timer(1000, this);
+    int elapsedTime = 30;
+    
     public String[] getLetters()
     {
         String[] letters = {"A","B","C","D","E","F","G","H","I","J","K","L","M",
@@ -18,7 +37,51 @@ public class GameWindow extends javax.swing.JFrame {
     
     public String getQuote()
     {
-        return "test";
+        String message = "";
+        try{
+        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+
+            out.println("get");
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.
+                    getInputStream()));
+            message = in.readLine();
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        
+        return message;
+    }
+    
+    public boolean validateQuote(String quote)
+    {
+        try
+        {
+        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+        String[] outMessage = quote.split("\n");
+        out.println(outMessage[0] + "&" + outMessage[1]);
+        
+        BufferedReader in = new BufferedReader(new InputStreamReader(socket.
+                    getInputStream()));
+            String message = in.readLine();
+            
+            if(message.compareTo("true") == 0)
+            {
+                return true;
+            }
+            else 
+            {
+                return false;
+            }
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        
+        return false;
     }
     
     public String setLetter()
@@ -153,8 +216,24 @@ public class GameWindow extends javax.swing.JFrame {
      * Creates new form GameWindow
      */
     public GameWindow() {
-        initComponents();
+        
         this.setLocationRelativeTo(null);
+        try
+        {
+        socket = new Socket("127.0.0.1", 9001);
+        
+        String message = getQuote();
+        quote = message.split("/n");
+        
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        
+        initComponents();
+        refreshTimer.start();
+        displayTimer.start();
     }
 
     /**
@@ -164,7 +243,8 @@ public class GameWindow extends javax.swing.JFrame {
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents() {
+    private void initComponents()
+    {
 
         jTextArea1 = new javax.swing.JTextArea();
         jPanel1 = new javax.swing.JPanel();
@@ -222,14 +302,17 @@ public class GameWindow extends javax.swing.JFrame {
         jComboBox27 = new javax.swing.JComboBox();
         jPanel2 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
+        jLabel22 = new javax.swing.JLabel();
+        jLabel28 = new javax.swing.JLabel();
         jTextArea2 = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jTextArea1.setEditable(false);
         jTextArea1.setColumns(20);
+        jTextArea1.setLineWrap(true);
         jTextArea1.setRows(5);
-        jTextArea1.setText("Quote Text. B c\nAuthor.");
+        jTextArea1.setText(quote[0] + "\n" + quote[1]);
         jTextArea1.setFocusable(false);
 
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -238,8 +321,10 @@ public class GameWindow extends javax.swing.JFrame {
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(getLetters()));
         jComboBox1.setSelectedItem(jComboBox1.getModel().getElementAt(0));
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jComboBox1.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 jComboBoxActionPerformed(evt);
             }
         });
@@ -249,8 +334,10 @@ public class GameWindow extends javax.swing.JFrame {
 
         jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(getLetters()));
         jComboBox2.setSelectedItem(jComboBox2.getModel().getElementAt(1));
-        jComboBox2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jComboBox2.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 jComboBoxActionPerformed(evt);
             }
         });
@@ -260,8 +347,10 @@ public class GameWindow extends javax.swing.JFrame {
 
         jComboBox3.setModel(new javax.swing.DefaultComboBoxModel(getLetters()));
         jComboBox3.setSelectedItem(jComboBox3.getModel().getElementAt(2));
-        jComboBox3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jComboBox3.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 jComboBoxActionPerformed(evt);
             }
         });
@@ -271,8 +360,10 @@ public class GameWindow extends javax.swing.JFrame {
 
         jComboBox4.setModel(new javax.swing.DefaultComboBoxModel(getLetters()));
         jComboBox4.setSelectedItem(jComboBox4.getModel().getElementAt(3));
-        jComboBox4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jComboBox4.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 jComboBoxActionPerformed(evt);
             }
         });
@@ -282,8 +373,10 @@ public class GameWindow extends javax.swing.JFrame {
 
         jComboBox5.setModel(new javax.swing.DefaultComboBoxModel(getLetters()));
         jComboBox5.setSelectedItem(jComboBox5.getModel().getElementAt(4));
-        jComboBox5.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jComboBox5.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 jComboBoxActionPerformed(evt);
             }
         });
@@ -293,8 +386,10 @@ public class GameWindow extends javax.swing.JFrame {
 
         jComboBox6.setModel(new javax.swing.DefaultComboBoxModel(getLetters()));
         jComboBox6.setSelectedItem(jComboBox6.getModel().getElementAt(5));
-        jComboBox6.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jComboBox6.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 jComboBoxActionPerformed(evt);
             }
         });
@@ -304,8 +399,10 @@ public class GameWindow extends javax.swing.JFrame {
 
         jComboBox7.setModel(new javax.swing.DefaultComboBoxModel(getLetters()));
         jComboBox7.setSelectedItem(jComboBox7.getModel().getElementAt(6));
-        jComboBox7.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jComboBox7.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 jComboBoxActionPerformed(evt);
             }
         });
@@ -315,8 +412,10 @@ public class GameWindow extends javax.swing.JFrame {
 
         jComboBox8.setModel(new javax.swing.DefaultComboBoxModel(getLetters()));
         jComboBox8.setSelectedItem(jComboBox8.getModel().getElementAt(7));
-        jComboBox8.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jComboBox8.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 jComboBoxActionPerformed(evt);
             }
         });
@@ -326,8 +425,10 @@ public class GameWindow extends javax.swing.JFrame {
 
         jComboBox9.setModel(new javax.swing.DefaultComboBoxModel(getLetters()));
         jComboBox9.setSelectedItem(jComboBox9.getModel().getElementAt(8));
-        jComboBox9.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jComboBox9.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 jComboBoxActionPerformed(evt);
             }
         });
@@ -337,8 +438,10 @@ public class GameWindow extends javax.swing.JFrame {
 
         jComboBox10.setModel(new javax.swing.DefaultComboBoxModel(getLetters()));
         jComboBox10.setSelectedItem(jComboBox10.getModel().getElementAt(9));
-        jComboBox10.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jComboBox10.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 jComboBoxActionPerformed(evt);
             }
         });
@@ -348,8 +451,10 @@ public class GameWindow extends javax.swing.JFrame {
 
         jComboBox11.setModel(new javax.swing.DefaultComboBoxModel(getLetters()));
         jComboBox11.setSelectedItem(jComboBox11.getModel().getElementAt(10));
-        jComboBox11.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jComboBox11.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 jComboBoxActionPerformed(evt);
             }
         });
@@ -359,8 +464,10 @@ public class GameWindow extends javax.swing.JFrame {
 
         jComboBox12.setModel(new javax.swing.DefaultComboBoxModel(getLetters()));
         jComboBox12.setSelectedItem(jComboBox12.getModel().getElementAt(11));
-        jComboBox12.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jComboBox12.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 jComboBoxActionPerformed(evt);
             }
         });
@@ -370,16 +477,20 @@ public class GameWindow extends javax.swing.JFrame {
 
         jComboBox13.setModel(new javax.swing.DefaultComboBoxModel(getLetters()));
         jComboBox13.setSelectedItem(jComboBox13.getModel().getElementAt(12));
-        jComboBox13.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jComboBox13.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 jComboBoxActionPerformed(evt);
             }
         });
 
         jComboBox14.setModel(new javax.swing.DefaultComboBoxModel(getLetters()));
         jComboBox14.setSelectedItem(jComboBox14.getModel().getElementAt(13));
-        jComboBox14.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jComboBox14.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 jComboBoxActionPerformed(evt);
             }
         });
@@ -389,8 +500,10 @@ public class GameWindow extends javax.swing.JFrame {
 
         jComboBox15.setModel(new javax.swing.DefaultComboBoxModel(getLetters()));
         jComboBox15.setSelectedItem(jComboBox15.getModel().getElementAt(14));
-        jComboBox15.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jComboBox15.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 jComboBoxActionPerformed(evt);
             }
         });
@@ -400,8 +513,10 @@ public class GameWindow extends javax.swing.JFrame {
 
         jComboBox16.setModel(new javax.swing.DefaultComboBoxModel(getLetters()));
         jComboBox16.setSelectedItem(jComboBox16.getModel().getElementAt(15));
-        jComboBox16.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jComboBox16.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 jComboBoxActionPerformed(evt);
             }
         });
@@ -411,8 +526,10 @@ public class GameWindow extends javax.swing.JFrame {
 
         jComboBox17.setModel(new javax.swing.DefaultComboBoxModel(getLetters()));
         jComboBox17.setSelectedItem(jComboBox17.getModel().getElementAt(16));
-        jComboBox17.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jComboBox17.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 jComboBoxActionPerformed(evt);
             }
         });
@@ -422,8 +539,10 @@ public class GameWindow extends javax.swing.JFrame {
 
         jComboBox18.setModel(new javax.swing.DefaultComboBoxModel(getLetters()));
         jComboBox18.setSelectedItem(jComboBox18.getModel().getElementAt(17));
-        jComboBox18.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jComboBox18.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 jComboBoxActionPerformed(evt);
             }
         });
@@ -433,8 +552,10 @@ public class GameWindow extends javax.swing.JFrame {
 
         jComboBox19.setModel(new javax.swing.DefaultComboBoxModel(getLetters()));
         jComboBox19.setSelectedItem(jComboBox19.getModel().getElementAt(18));
-        jComboBox19.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jComboBox19.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 jComboBoxActionPerformed(evt);
             }
         });
@@ -444,8 +565,10 @@ public class GameWindow extends javax.swing.JFrame {
 
         jComboBox20.setModel(new javax.swing.DefaultComboBoxModel(getLetters()));
         jComboBox20.setSelectedItem(jComboBox20.getModel().getElementAt(19));
-        jComboBox20.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jComboBox20.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 jComboBoxActionPerformed(evt);
             }
         });
@@ -455,8 +578,10 @@ public class GameWindow extends javax.swing.JFrame {
 
         jComboBox21.setModel(new javax.swing.DefaultComboBoxModel(getLetters()));
         jComboBox21.setSelectedItem(jComboBox21.getModel().getElementAt(20));
-        jComboBox21.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jComboBox21.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 jComboBoxActionPerformed(evt);
             }
         });
@@ -469,8 +594,10 @@ public class GameWindow extends javax.swing.JFrame {
 
         jComboBox23.setModel(new javax.swing.DefaultComboBoxModel(getLetters()));
         jComboBox23.setSelectedItem(jComboBox23.getModel().getElementAt(21));
-        jComboBox23.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jComboBox23.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 jComboBoxActionPerformed(evt);
             }
         });
@@ -480,8 +607,10 @@ public class GameWindow extends javax.swing.JFrame {
 
         jComboBox24.setModel(new javax.swing.DefaultComboBoxModel(getLetters()));
         jComboBox24.setSelectedItem(jComboBox24.getModel().getElementAt(22));
-        jComboBox24.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jComboBox24.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 jComboBoxActionPerformed(evt);
             }
         });
@@ -491,8 +620,10 @@ public class GameWindow extends javax.swing.JFrame {
 
         jComboBox25.setModel(new javax.swing.DefaultComboBoxModel(getLetters()));
         jComboBox25.setSelectedItem(jComboBox25.getModel().getElementAt(23));
-        jComboBox25.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jComboBox25.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 jComboBoxActionPerformed(evt);
             }
         });
@@ -502,8 +633,10 @@ public class GameWindow extends javax.swing.JFrame {
 
         jComboBox26.setModel(new javax.swing.DefaultComboBoxModel(getLetters()));
         jComboBox26.setSelectedItem(jComboBox26.getModel().getElementAt(24));
-        jComboBox26.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jComboBox26.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 jComboBoxActionPerformed(evt);
             }
         });
@@ -513,16 +646,20 @@ public class GameWindow extends javax.swing.JFrame {
 
         jComboBox27.setModel(new javax.swing.DefaultComboBoxModel(getLetters()));
         jComboBox27.setSelectedItem(jComboBox27.getModel().getElementAt(25));
-        jComboBox27.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jComboBox27.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 jComboBoxActionPerformed(evt);
             }
         });
 
         jButton1.setText("New Puzzle");
         jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jButton1.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 jButton1ActionPerformed(evt);
             }
         });
@@ -543,6 +680,11 @@ public class GameWindow extends javax.swing.JFrame {
                 .addComponent(jButton1)
                 .addContainerGap(28, Short.MAX_VALUE))
         );
+
+        jLabel22.setText("Time Remaining");
+        jLabel22.setToolTipText("");
+
+        jLabel28.setText("testes");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -641,58 +783,61 @@ public class GameWindow extends javax.swing.JFrame {
                                 .addComponent(jComboBox13, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jComboBox15, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jComboBox16, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jComboBox17, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jComboBox18, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jComboBox19, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel19, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jComboBox20, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jComboBox21, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jComboBox23, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel23, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jComboBox24, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel24, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jComboBox25, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jComboBox26, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel26, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jComboBox15, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jComboBox16, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jComboBox17, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jComboBox18, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jComboBox19, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel19, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jComboBox20, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jComboBox21, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jComboBox23, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel23, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jComboBox24, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel24, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jComboBox25, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jComboBox26, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel26, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(145, 145, 145)
+                                .addComponent(jLabel22)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jComboBox27, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel27, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(53, 53, 53))))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(jLabel27, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel28))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -789,30 +934,38 @@ public class GameWindow extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jComboBox14, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 45, Short.MAX_VALUE)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel28)
+                        .addComponent(jLabel22))))
         );
 
         jTextArea2.setEditable(false);
         jTextArea2.setColumns(20);
+        jTextArea2.setLineWrap(true);
         jTextArea2.setRows(5);
-        jTextArea2.setText("Quote Text. B c\nAuthor.");
+        jTextArea2.setText(quote[0] + "\n" + quote[1]);
         jTextArea2.setFocusable(false);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTextArea1, javax.swing.GroupLayout.DEFAULT_SIZE, 814, Short.MAX_VALUE)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(39, 39, 39))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jTextArea1)
+                        .addContainerGap())))
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
                     .addContainerGap()
-                    .addComponent(jTextArea2, javax.swing.GroupLayout.DEFAULT_SIZE, 814, Short.MAX_VALUE)
-                    .addContainerGap()))
+                    .addComponent(jTextArea2)
+                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -832,10 +985,14 @@ public class GameWindow extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton1ActionPerformed
+    {//GEN-HEADEREND:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        jTextArea1.setText(getQuote());
-        jTextArea2.setText(getQuote());
+        validationFlag = true;
+        String message = getQuote();
+        quote = message.split("/n");
+        jTextArea1.setText(quote[0] + "\n" + quote[1]);
+        jTextArea2.setText(quote[0] + "\n" + quote[1]);
         jComboBox1.setSelectedItem(jComboBox1.getModel().getElementAt(0));
         jComboBox2.setSelectedItem(jComboBox2.getModel().getElementAt(1));
         jComboBox3.setSelectedItem(jComboBox3.getModel().getElementAt(2));
@@ -862,11 +1019,25 @@ public class GameWindow extends javax.swing.JFrame {
         jComboBox25.setSelectedItem(jComboBox25.getModel().getElementAt(23));
         jComboBox26.setSelectedItem(jComboBox26.getModel().getElementAt(24));
         jComboBox27.setSelectedItem(jComboBox27.getModel().getElementAt(25));
+        validationFlag = false;
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void jComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxActionPerformed
-            // TODO add your handling code here:
-        jTextArea1.setText(setLetter());        
+    private void jComboBoxActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jComboBoxActionPerformed
+    {//GEN-HEADEREND:event_jComboBoxActionPerformed
+        // TODO add your handling code here:
+        refreshTimer.restart();
+        displayTimer.restart();
+        jTextArea1.setText(setLetter());
+        elapsedTime = 30;
+        if(!validationFlag)
+        {
+            boolean validation = validateQuote(jTextArea1.getText());
+            if(validation)
+            {
+                JOptionPane.showMessageDialog(this, "Congratulations, you did it!");
+            }
+        }
+
     }//GEN-LAST:event_jComboBoxActionPerformed
 
     /**
@@ -945,11 +1116,13 @@ public class GameWindow extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
+    private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel23;
     private javax.swing.JLabel jLabel24;
     private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel26;
     private javax.swing.JLabel jLabel27;
+    private javax.swing.JLabel jLabel28;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -962,4 +1135,48 @@ public class GameWindow extends javax.swing.JFrame {
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextArea jTextArea2;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void actionPerformed(ActionEvent e)
+    {
+        if(e.getSource() == refreshTimer)
+        {
+        validationFlag = true;
+        String message = getQuote();
+        quote = message.split("/n");
+        jTextArea1.setText(quote[0] + "\n" + quote[1]);
+        jTextArea2.setText(quote[0] + "\n" + quote[1]);
+        jComboBox1.setSelectedItem(jComboBox1.getModel().getElementAt(0));
+        jComboBox2.setSelectedItem(jComboBox2.getModel().getElementAt(1));
+        jComboBox3.setSelectedItem(jComboBox3.getModel().getElementAt(2));
+        jComboBox4.setSelectedItem(jComboBox4.getModel().getElementAt(3));
+        jComboBox5.setSelectedItem(jComboBox5.getModel().getElementAt(4));
+        jComboBox6.setSelectedItem(jComboBox6.getModel().getElementAt(5));
+        jComboBox7.setSelectedItem(jComboBox7.getModel().getElementAt(6));
+        jComboBox8.setSelectedItem(jComboBox8.getModel().getElementAt(7));
+        jComboBox9.setSelectedItem(jComboBox9.getModel().getElementAt(8));
+        jComboBox10.setSelectedItem(jComboBox10.getModel().getElementAt(9));
+        jComboBox11.setSelectedItem(jComboBox11.getModel().getElementAt(10));
+        jComboBox12.setSelectedItem(jComboBox12.getModel().getElementAt(11));
+        jComboBox13.setSelectedItem(jComboBox13.getModel().getElementAt(12));
+        jComboBox14.setSelectedItem(jComboBox14.getModel().getElementAt(13));
+        jComboBox15.setSelectedItem(jComboBox15.getModel().getElementAt(14));
+        jComboBox16.setSelectedItem(jComboBox16.getModel().getElementAt(15));
+        jComboBox17.setSelectedItem(jComboBox17.getModel().getElementAt(16));
+        jComboBox18.setSelectedItem(jComboBox18.getModel().getElementAt(17));
+        jComboBox19.setSelectedItem(jComboBox19.getModel().getElementAt(18));
+        jComboBox20.setSelectedItem(jComboBox20.getModel().getElementAt(19));
+        jComboBox21.setSelectedItem(jComboBox21.getModel().getElementAt(20));
+        jComboBox23.setSelectedItem(jComboBox23.getModel().getElementAt(21));
+        jComboBox24.setSelectedItem(jComboBox24.getModel().getElementAt(22));
+        jComboBox25.setSelectedItem(jComboBox25.getModel().getElementAt(23));
+        jComboBox26.setSelectedItem(jComboBox26.getModel().getElementAt(24));
+        jComboBox27.setSelectedItem(jComboBox27.getModel().getElementAt(25));
+        validationFlag = false;
+        }
+        else if(e.getSource() == displayTimer)
+        {
+         jLabel28.setText(":"  + elapsedTime--);
+        }
+    }
 }

@@ -49,7 +49,7 @@ public class Cypher
                 }
                 else
                 {
-                    String[] message = command.split("/n");
+                    String[] message = command.split("&");
                     if(message[0].compareToIgnoreCase(cypher.quote[0]) == 0 &&
                             message[1].compareToIgnoreCase(cypher.quote[1]) == 0)
                     {
